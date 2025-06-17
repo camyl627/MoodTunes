@@ -1,0 +1,29 @@
+For Backend
+Creating Folder: mkdir backend 
+Initialization: npm init -y
+OpenAI and Express: npm i openai cors body-parser express
+OpenAI: npm install openai
+
+Notes:
+Removed "description": "" and changed to 
+Create an 'index.js' file
+
+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
+
+npm install openai
+
+import OpenAI from "openai";
+
+const openai = new OpenAI({
+  apiKey: "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",
+});
+
+const completion = openai.chat.completions.create({
+  model: "gpt-4o-mini",
+  store: true,
+  messages: [
+    {"role": "user", "content": "write a haiku about ai"},
+  ],
+});
+
+completion.then((result) => console.log(result.choices[0].message));

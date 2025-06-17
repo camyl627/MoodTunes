@@ -1,0 +1,102 @@
+/* Header.css */
+
+.header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  padding: 20px;
+}
+
+.navigation-bar {
+  width: 100%;
+}
+
+.nav-content {
+  background-color: #f5f5f5;
+  border-radius: 25px;
+  padding: 12px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.logo-section {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.logo-icon {
+  font-size: 1.2rem;
+  color: var(--primary-color, #36454F);
+}
+
+.logo-text {
+  font-family: var(--font-primary, 'DarumadropOne', cursive);
+  font-size: 1.1rem;
+  color: var(--primary-color, #36454F);
+  font-weight: 400;
+}
+
+.about-button {
+  background-color: transparent;
+  border: none;
+  font-family: var(--font-secondary, 'Poppins', sans-serif);
+  font-size: 0.9rem;
+  color: var(--primary-color, #36454F);
+  cursor: pointer;
+  padding: 8px 16px;
+  border-radius: 15px;
+  transition: all 0.3s ease;
+  font-weight: 500;
+}
+
+.about-button:hover {
+  background-color: rgba(138, 159, 255, 0.1);
+  color: var(--secondary-color, #41424C);
+}
+
+.about-button:active {
+  transform: translateY(1px);
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .header {
+    padding: 10px 15px;
+  }
+  
+  .nav-content {
+    padding: 10px 16px;
+  }
+  
+  .logo-text {
+    font-size: 1rem;
+  }
+  
+  .about-button {
+    font-size: 0.85rem;
+    padding: 6px 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .header {
+    padding: 8px 10px;
+  }
+  
+  .nav-content {
+    padding: 8px 12px;
+  }
+  
+  .logo-section {
+    gap: 6px;
+  }
+  
+  .logo-text {
+    font-size: 0.9rem;
+  }
+}

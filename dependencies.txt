@@ -1,0 +1,30 @@
+Core Framework
+npm install react
+npm install react-dom
+
+Utilities
+npm install bootstrap jquery axios
+npm install jwt-decode
+
+Linting
+npm install eslint
+npm install eslint-plugin-react-hooks
+npm install eslint-plugin-react-refresh
+npm install globals
+
+Building
+npm install vite
+
+UI/UX
+npm install react-loading-skeleton
+npm install react-icons
+npm install react-toastify
+
+Forms and Validation
+npm install react-hook-form
+
+Routing
+npm install react-router-dom
+
+Type Checking
+npm install prop-types
