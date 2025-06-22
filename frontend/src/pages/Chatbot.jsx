@@ -55,7 +55,6 @@ const Chatbot = () => {
     const trimmedInput = input.trim();
     if (!trimmedInput || isSending) return;
 
-    // User message
     appendMessage(trimmedInput, 'user');
     setInput('');
     setIsSending(true);
@@ -66,7 +65,7 @@ const Chatbot = () => {
         ? `My mood is: ${trimmedInput}. Give me a song and lyrics that matches.`
         : trimmedInput;
 
-      const response = await fetch('http://localhost:5000/', {
+      const response = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
