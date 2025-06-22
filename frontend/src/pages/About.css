@@ -15,9 +15,9 @@
 }
 
 .about-title {
-  font-family: var(--font-primary, 'DarumadropOne', cursive);
+  font-family: var(--font-primary);
   font-size: 3rem;
-  color: var(--tertiary-color, #FFFFF0);
+  color: var(--tertiary-color);
   margin-bottom: 2rem;
   font-weight: 400;
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
@@ -33,10 +33,10 @@
 }
 
 .about-description {
-  font-family: var(--font-secondary, 'Poppins', sans-serif);
+  font-family: var(--font-secondary);
   font-size: 1.1rem;
   line-height: 1.8;
-  color: var(--tertiary-color, #FFFFF0);
+  color: var(--tertiary-color);
   margin: 0;
   font-weight: 300;
   text-align: left;

@@ -31,22 +31,22 @@
 
 .logo-icon {
   font-size: 1.2rem;
-  color: var(--primary-color, #36454F);
+  color: var(--primary-color);
 }
 
 .logo-text {
-  font-family: var(--font-primary, 'DarumadropOne', cursive);
+  font-family: var(--font-primary, 'DarumadropOne');
   font-size: 1.1rem;
-  color: var(--primary-color, #36454F);
+  color: var(--primary-color);
   font-weight: 400;
 }
 
 .about-button {
   background-color: transparent;
   border: none;
-  font-family: var(--font-secondary, 'Poppins', sans-serif);
+  font-family: var(--font-secondary);
   font-size: 0.9rem;
-  color: var(--primary-color, #36454F);
+  color: var(--primary-color);
   cursor: pointer;
   padding: 8px 16px;
   border-radius: 15px;
@@ -56,7 +56,7 @@
 
 .about-button:hover {
   background-color: rgba(138, 159, 255, 0.1);
-  color: var(--secondary-color, #41424C);
+  color: var(--secondary-color);
 }
 
 .about-button:active {

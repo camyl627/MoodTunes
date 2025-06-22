@@ -2,13 +2,13 @@
 
 /* Sticky footer at the bottom of the viewport */
 .footer {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  z-index: 1000;
+  position: static; /* or just remove the 'position' line entirely */
   width: 100%;
+  padding: 2rem;
+  margin-top: 2rem;
+  background-color: #f1f1f1; /* optional */
 }
+
 
 /* Flex layout for footer content */
 .footer-content {
@@ -35,7 +35,7 @@
 }
 
 .footer-logo-text {
-  font-family: var(--font-primary, 'DarumadropOne', cursive);
+  font-family: var(--font-primary);
   font-size: 1rem;
   color: var(--primary-color, #36454F);
   font-weight: 400;
@@ -52,7 +52,7 @@
 .footer-year {
   font-family: var(--font-secondary);
   font-size: 0.9rem;
-  color: var(--secondary-color, #41424C);
+  color: var(--secondary-color);
   font-weight: 400;
 }
 
@@ -67,7 +67,7 @@
 .credits-text {
   font-family: var(--font-secondary);
   font-size: 0.9rem;
-  color: var(--primary-color, #36454F);
+  color: var(--primary-color);
   font-weight: 500;
 }
 
