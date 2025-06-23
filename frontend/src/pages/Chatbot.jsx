@@ -61,37 +61,9 @@ const Chatbot = () => {
 
       // Example AI format: "Some lyrics here"\n— Song Title by Artist
       const parts = botOutput.split('\n— ');
-if (parts.length === 2) {
-  const lyrics = parts[0].replace(/^"|"$/g, '');
-  const [title, artist] = parts[1].split(' by ');
-
-  const searchQuery = `${title} ${artist}`;
-  const geniusLink = `https://genius.com/search?q=${encodeURIComponent(searchQuery)}`;
-  const spotifySearchLink = `https://open.spotify.com/search/${encodeURIComponent(searchQuery)}`;
-
-  appendMessage(
-    <>
-      <div className="embed-card">
-        <p className="lyrics">"{lyrics}"</p>
-        <p className="song-info">🎵 <strong>{title}</strong> by <em>{artist}</em></p>
-
-        <iframe
-          title="Spotify Embed"
-          src={`https://open.spotify.com/embed/search/${encodeURIComponent(searchQuery)}`}
-          width="100%"
-          height="80"
-          frameBorder="0"
-          allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
-          loading="lazy"
-        ></iframe>
-
-        <a className="genius-link" href={geniusLink} target="_blank" rel="noopener noreferrer">
-          📖 View full lyrics on Genius
-        </a>
-      </div>
-    </>
-  );
-
+      if (parts.length === 2) {
+        const lyrics = parts[0].replace(/^"|"$/g, '');
+        const [title, artist] = parts[1].split(' by ');
         appendMessage(
           <>
             <p className="lyrics">"{lyrics}"</p>

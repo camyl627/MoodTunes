@@ -166,37 +166,6 @@
   font-size: clamp(1rem, 4vw, 1.2rem);
 }
 
-.embed-card {
-  background: linear-gradient(135deg, #8A9FFF, #764BA2);
-  padding: 16px;
-  border-radius: 12px;
-  color: white;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-  margin-bottom: 1rem;
-}
-
-.embed-card .lyrics {
-  font-style: italic;
-  font-size: 1.1rem;
-  margin-bottom: 8px;
-}
-
-.embed-card .song-info {
-  font-weight: 500;
-  margin-bottom: 10px;
-}
-
-.embed-card iframe {
-  border-radius: 8px;
-  margin-bottom: 10px;
-}
-
-.genius-link {
-  color: #ffe;
-  text-decoration: underline;
-  font-size: 0.9rem;
-}
-
 /* ============= */
 /* SCROLLBARS    */
 /* ============= */
