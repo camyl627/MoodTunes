@@ -6,7 +6,7 @@ const Header = () => {
     <header className="header">
       <nav className="navigation-bar">
         <div className="nav-content">
-          <div className="logo-section">
+          <NavLink to="/" className="logo-section">
             <img
               src="/MoodTunesImage.svg"
               alt="MoodTunes Logo"
@@ -14,7 +14,7 @@ const Header = () => {
               style={{ height: '32px', marginRight: '8px' }}
             />
             <span className="logo-text">MoodTunes</span>
-          </div>
+          </NavLink>
           <NavLink to="/about" className="about-button">
             About
           </NavLink>

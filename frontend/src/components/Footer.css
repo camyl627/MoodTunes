@@ -2,13 +2,12 @@
 
 /* Sticky footer at the bottom of the viewport */
 .footer {
-  position: static; /* or just remove the 'position' line entirely */
+  position: static;
   width: 100%;
   padding: 2rem;
   margin-top: 2rem;
-  background-color: #f1f1f1; /* optional */
+  background-color: #f1f1f1;
 }
-
 
 /* Flex layout for footer content */
 .footer-content {
@@ -74,7 +73,7 @@
 .credits-icons {
   display: flex;
   align-items: center;
-  gap: 16px; /* More space between Genius and Spotify */
+  gap: 16px;
 }
 
 .credit-icon {

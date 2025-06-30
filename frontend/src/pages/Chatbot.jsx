@@ -14,6 +14,7 @@ const Chatbot = () => {
   const [playlistMood, setPlaylistMood] = useState('');
   const [isPlaylistMode, setIsPlaylistMode] = useState(false);
   const [lastRecommendedSong, setLastRecommendedSong] = useState(null);
+  const [currentMoodTheme, setCurrentMoodTheme] = useState('');
   const hasShownWelcomeRef = useRef(false);
 
   // Debug: Log when component mounts and add welcome message
@@ -76,15 +77,11 @@ const Chatbot = () => {
     }
   }, []);
 
-  const messagesEndRef = useRef(null);
 
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  };
 
-  useEffect(() => {
-    scrollToBottom();
-  }, [messages]);
+  // Removed automatic scroll - users can scroll manually for better control
+
+
 
   const appendMessage = (text, sender = 'bot') => {
     console.log('Adding message:', { text, sender });
@@ -96,6 +93,57 @@ const Chatbot = () => {
   const handleKeyDown = (e) => {
     if (e.key === 'Enter' && !isSending) {
       sendMessage();
+    }
+  };
+
+  // Detect mood from user messages and update theme
+  const detectAndUpdateMood = (message) => {
+    const lowerMessage = message.toLowerCase();
+
+    // Mood detection keywords
+    const moodKeywords = {
+      happy: ['happy', 'joyful', 'excited', 'cheerful', 'upbeat', 'energetic', 'positive', 'good', 'great', 'amazing', 'fantastic', 'wonderful'],
+      sad: ['sad', 'depressed', 'down', 'blue', 'melancholy', 'lonely', 'heartbroken', 'crying', 'tears', 'sorrow', 'grief'],
+      energetic: ['energetic', 'pumped', 'hyped', 'active', 'workout', 'gym', 'running', 'dancing', 'party', 'wild', 'intense'],
+      calm: ['calm', 'peaceful', 'relaxed', 'chill', 'zen', 'meditative', 'quiet', 'serene', 'tranquil', 'mellow'],
+      romantic: ['romantic', 'love', 'valentine', 'date', 'crush', 'relationship', 'intimate', 'passionate', 'tender', 'sweet'],
+      nostalgic: ['nostalgic', 'memories', 'past', 'childhood', 'old', 'vintage', 'throwback', 'remember', 'miss', 'used to'],
+      dark: ['dark', 'gothic', 'metal', 'heavy', 'intense', 'angry', 'rage', 'frustrated', 'mad', 'aggressive']
+    };
+
+    // Find the mood with the most keyword matches
+    let detectedMood = '';
+    let maxMatches = 0;
+
+    Object.entries(moodKeywords).forEach(([mood, keywords]) => {
+      const matches = keywords.filter(keyword => lowerMessage.includes(keyword)).length;
+      if (matches > maxMatches) {
+        maxMatches = matches;
+        detectedMood = mood;
+      }
+    });
+
+    // Update mood theme if detected
+    if (detectedMood && detectedMood !== currentMoodTheme) {
+      setCurrentMoodTheme(detectedMood);
+      console.log('Mood detected and updated:', detectedMood);
+
+      // Add a subtle notification about mood change
+      setTimeout(() => {
+        appendMessage(
+          <div style={{
+            textAlign: 'center',
+            padding: '8px 16px',
+            background: 'rgba(255, 255, 255, 0.1)',
+            borderRadius: '12px',
+            fontSize: '0.9rem',
+            opacity: 0.8,
+            fontStyle: 'italic'
+          }}>
+            🎨 Theme updated to match your {detectedMood} mood
+          </div>
+        );
+      }, 1000);
     }
   };
 
@@ -716,6 +764,8 @@ const Chatbot = () => {
     // Add user message unless we're skipping it
     if (!skipUserMessage) {
       appendMessage(messageToSend, 'user');
+      // Detect mood from user message
+      detectAndUpdateMood(messageToSend);
     }
 
     // Only clear input if it's from the input field
@@ -1118,11 +1168,27 @@ const Chatbot = () => {
   };
 
   return (
-    <div className="chatbot-page">
-      <header className="chatbot-heading">
+    <div className={`chatbot-page ${currentMoodTheme ? `mood-${currentMoodTheme}` : ''}`}>
+      <div className="chatbot-heading">
         <h1>Hi there, welcome to MoodTunes!</h1>
         <h2>What's your current mood or vibe?</h2>
-      </header>
+        {currentMoodTheme && (
+          <div className="mood-indicator">
+            <span className="mood-emoji">
+              {currentMoodTheme === 'happy' && '😊'}
+              {currentMoodTheme === 'sad' && '😢'}
+              {currentMoodTheme === 'energetic' && '⚡'}
+              {currentMoodTheme === 'calm' && '😌'}
+              {currentMoodTheme === 'romantic' && '💕'}
+              {currentMoodTheme === 'nostalgic' && '🌅'}
+              {currentMoodTheme === 'dark' && '🖤'}
+            </span>
+            <span className="mood-text">
+              {currentMoodTheme.charAt(0).toUpperCase() + currentMoodTheme.slice(1)} vibes detected
+            </span>
+          </div>
+        )}
+      </div>
 
       <main className="chatbot-container">
         <div className="messages">
@@ -1131,7 +1197,15 @@ const Chatbot = () => {
               {typeof msg.text === 'string' ? <p>{msg.text}</p> : msg.text}
             </div>
           ))}
-          <div ref={messagesEndRef} />
+          {isSending && (
+            <div className="message bot typing-indicator">
+              <div className="typing-dots">
+                <span></span>
+                <span></span>
+                <span></span>
+              </div>
+            </div>
+          )}
         </div>
 
         <div className="input-container">
@@ -1140,7 +1214,10 @@ const Chatbot = () => {
             value={input}
             onChange={handleInputChange}
             onKeyDown={handleKeyDown}
-            placeholder="How are you feeling?"
+            placeholder={currentMoodTheme ?
+              `Tell me more about your ${currentMoodTheme} mood...` :
+              "How are you feeling? Tell me your mood..."
+            }
             className="message-input"
             disabled={isSending}
           />
@@ -1148,8 +1225,9 @@ const Chatbot = () => {
             onClick={() => sendMessage()}
             disabled={isSending || !input.trim()}
             className="send-button"
+            title={isSending ? "Sending..." : "Send message"}
           >
-            {isSending ? '...' : <IoSend />}
+            {isSending ? '⏳' : <IoSend />}
           </button>
         </div>
       </main>
