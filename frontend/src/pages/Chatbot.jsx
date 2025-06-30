@@ -10,17 +10,9 @@ const Chatbot = () => {
   const [input, setInput] = useState('');
   const [isSending, setIsSending] = useState(false);
   const [conversationHistory, setConversationHistory] = useState([]);
-  // Use the clean playlist hook
-  const {
-    playlist: currentPlaylist,
-    isPlaylistMode,
-    addSong: addSongToPlaylist,
-    removeSong: removeSongFromPlaylist,
-    clearPlaylist,
-    startNewPlaylist,
-    canSaveToSpotify,
-    playlistLength
-  } = usePlaylist();
+  // Simple playlist state - direct approach
+  const [currentPlaylist, setCurrentPlaylist] = useState([]);
+  const [isPlaylistMode, setIsPlaylistMode] = useState(false);
 
   const [spotifyToken, setSpotifyToken] = useState(null);
   const [isSpotifyConnected, setIsSpotifyConnected] = useState(false);
@@ -187,35 +179,45 @@ const Chatbot = () => {
     }
   };
 
-  // Playlist helper functions using the hook
-  const handleAddSongToPlaylist = (song) => {
-    console.log('🎵 Attempting to add song:', song.title);
-    console.log('📋 Current playlist before add:', currentPlaylist.length);
+  // Simple, direct playlist functions
+  const addSongToPlaylist = (song) => {
+    console.log('🎵 Adding song:', song.title);
+    console.log('📋 Current playlist before:', currentPlaylist.length);
 
-    const success = addSongToPlaylist(song);
-    console.log('✅ Add result:', success);
-    console.log('📋 Current playlist after add:', currentPlaylist.length);
+    // Check for duplicates
+    const isDuplicate = currentPlaylist.some(existingSong =>
+      existingSong.title === song.title && existingSong.artist === song.artist
+    );
 
-    if (success) {
-      setLastRecommendedSong(song);
-      return true;
-    } else {
-      appendMessage(`⚠️ "${song.title}" by ${song.artist} is already in your playlist!`);
+    if (isDuplicate) {
+      console.log('⚠️ Song already exists');
       return false;
     }
-  };
 
-  const handleStartNewPlaylist = (song) => {
-    console.log('🎵 Starting new playlist with:', song.title);
-    startNewPlaylist(song);
+    // Add song directly to state
+    setCurrentPlaylist(prevPlaylist => {
+      const newPlaylist = [...prevPlaylist, song];
+      console.log('✅ New playlist length:', newPlaylist.length);
+      return newPlaylist;
+    });
+
+    setIsPlaylistMode(true);
     setLastRecommendedSong(song);
-    console.log('📋 Playlist after start:', currentPlaylist.length);
     return true;
   };
 
-  const handleClearPlaylist = () => {
+  const startNewPlaylist = (song) => {
+    console.log('🎵 Starting new playlist with:', song.title);
+    setCurrentPlaylist([song]);
+    setIsPlaylistMode(true);
+    setLastRecommendedSong(song);
+    return true;
+  };
+
+  const clearPlaylist = () => {
     console.log('🗑️ Clearing playlist');
-    clearPlaylist();
+    setCurrentPlaylist([]);
+    setIsPlaylistMode(false);
     setPlaylistName('');
     setLastRecommendedSong(null);
   };
@@ -247,7 +249,7 @@ const Chatbot = () => {
           onRemoveSongs={() => showRemoveSongOptions()}
           onSaveToSpotify={() => handleFollowUpAction('create_spotify_playlist')}
           onClearPlaylist={() => {
-            handleClearPlaylist();
+            clearPlaylist();
             appendMessage('🗑️ Playlist cleared!');
           }}
         />
@@ -423,7 +425,7 @@ const Chatbot = () => {
         case 'start_playlist_with_song':
           const songToAdd = data || lastRecommendedSong;
           if (songToAdd) {
-            handleStartNewPlaylist(songToAdd);
+            startNewPlaylist(songToAdd);
             appendMessage(`🎵 Started a new playlist! Added "${songToAdd.title}" by ${songToAdd.artist} as your first song.`);
 
             // Show the playlist immediately
@@ -438,7 +440,7 @@ const Chatbot = () => {
         case 'add_current':
           const songToAddCurrent = data || lastRecommendedSong;
           if (songToAddCurrent) {
-            const success = handleAddSongToPlaylist(songToAddCurrent);
+            const success = addSongToPlaylist(songToAddCurrent);
             if (success) {
               appendMessage(`✅ Added "${songToAddCurrent.title}" by ${songToAddCurrent.artist} to your playlist!`);
 
@@ -446,6 +448,8 @@ const Chatbot = () => {
               setTimeout(() => {
                 showCurrentPlaylistAndActions();
               }, 300);
+            } else {
+              appendMessage(`⚠️ "${songToAddCurrent.title}" by ${songToAddCurrent.artist} is already in your playlist!`);
             }
           } else {
             appendMessage('❌ No song to add. Please get a song recommendation first!');
@@ -657,7 +661,7 @@ const Chatbot = () => {
 
       if (isPlaylistMode || currentPlaylist.length > 0) {
         // User is building a playlist - automatically add the song and show updated playlist
-        const success = handleAddSongToPlaylist(currentSong);
+        const success = addSongToPlaylist(currentSong);
         if (success) {
           appendMessage(`✅ Added "${currentSong.title}" by ${currentSong.artist} to your playlist!`);
 
@@ -665,6 +669,8 @@ const Chatbot = () => {
           setTimeout(() => {
             showCurrentPlaylistAndActions();
           }, 500);
+        } else {
+          appendMessage(`⚠️ "${currentSong.title}" by ${currentSong.artist} is already in your playlist!`);
         }
       } else {
         // Regular song discovery mode
@@ -697,7 +703,7 @@ const Chatbot = () => {
                 console.log('🧪 Testing playlist add...');
                 console.log('📋 Before add:', currentPlaylist.length);
 
-                const success = handleAddSongToPlaylist(testSong);
+                const success = addSongToPlaylist(testSong);
 
                 // Check state after a short delay to allow for async updates
                 setTimeout(() => {
