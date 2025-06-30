@@ -4,31 +4,136 @@
   flex-direction: column;
   min-height: 100vh;
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: background 1.2s cubic-bezier(0.4, 0, 0.2, 1), color 0.8s ease;
   overflow-x: hidden;
   position: relative;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
 }
 
-/* Inherit mood classes from chatbot page */
-.app.mood-happy,
-.app.mood-sad,
-.app.mood-energetic,
-.app.mood-calm,
-.app.mood-romantic,
-.app.mood-nostalgic,
+/* Mood-based app themes with smooth transitions */
+.app.mood-happy {
+  background: linear-gradient(135deg, #f6ad55 0%, #ed8936 50%, #38b2ac 100%);
+  animation: happyGlow 4s ease-in-out infinite alternate;
+
+  /* Header & Footer Colors */
+  --header-nav-bg: rgba(255, 248, 220, 0.95);
+  --header-border: rgba(246, 173, 85, 0.3);
+  --header-text-color: #b7791f;
+  --header-text-hover-color: #d69e2e;
+  --header-button-bg: rgba(246, 173, 85, 0.1);
+  --header-button-border: rgba(246, 173, 85, 0.3);
+  --header-button-color: #b7791f;
+  --header-button-hover-bg: rgba(246, 173, 85, 0.2);
+  --header-button-hover-color: #d69e2e;
+
+  --footer-bg: rgba(255, 248, 220, 0.3);
+  --footer-content-bg: rgba(255, 248, 220, 0.95);
+  --footer-border: rgba(246, 173, 85, 0.3);
+  --footer-text-color: #b7791f;
+  --footer-year-color: #d69e2e;
+  --footer-credits-color: #b7791f;
+  --footer-icon-color: #d69e2e;
+  --footer-icon-bg: rgba(246, 173, 85, 0.1);
+  --footer-icon-hover-color: #38b2ac;
+  --footer-icon-hover-bg: rgba(56, 178, 172, 0.15);
+}
+
+.app.mood-sad {
+  background: linear-gradient(135deg, #4299e1 0%, #3182ce 50%, #805ad5 100%);
+  animation: sadFlow 6s ease-in-out infinite alternate;
+
+  /* Header & Footer Colors */
+  --header-nav-bg: rgba(226, 232, 240, 0.95);
+  --header-border: rgba(66, 153, 225, 0.3);
+  --header-text-color: #2c5282;
+  --header-text-hover-color: #3182ce;
+  --header-button-bg: rgba(66, 153, 225, 0.1);
+  --header-button-border: rgba(66, 153, 225, 0.3);
+  --header-button-color: #2c5282;
+  --header-button-hover-bg: rgba(66, 153, 225, 0.2);
+  --header-button-hover-color: #3182ce;
+
+  --footer-bg: rgba(226, 232, 240, 0.3);
+  --footer-content-bg: rgba(226, 232, 240, 0.95);
+  --footer-border: rgba(66, 153, 225, 0.3);
+  --footer-text-color: #2c5282;
+  --footer-year-color: #3182ce;
+  --footer-credits-color: #2c5282;
+  --footer-icon-color: #3182ce;
+  --footer-icon-bg: rgba(66, 153, 225, 0.1);
+  --footer-icon-hover-color: #805ad5;
+  --footer-icon-hover-bg: rgba(128, 90, 213, 0.15);
+}
+
+.app.mood-energetic {
+  background: linear-gradient(135deg, #f56565 0%, #e53e3e 25%, #38b2ac 50%, #f56565 75%, #e53e3e 100%);
+  animation: energeticPulse 2s ease-in-out infinite alternate;
+}
+
+.app.mood-calm {
+  background: linear-gradient(135deg, #63b3ed 0%, #4299e1 50%, #68d391 100%);
+  animation: calmWave 8s ease-in-out infinite alternate;
+}
+
+.app.mood-romantic {
+  background: linear-gradient(135deg, #f687b3 0%, #ed64a6 50%, #9f7aea 100%);
+  animation: romanticGlow 5s ease-in-out infinite alternate;
+}
+
+.app.mood-nostalgic {
+  background: linear-gradient(135deg, #fbb6ce 0%, #f687b3 50%, #9f7aea 100%);
+  animation: nostalgicFade 7s ease-in-out infinite alternate;
+}
+
 .app.mood-dark {
-  background: inherit;
+  background: linear-gradient(135deg, #4a5568 0%, #2d3748 50%, #1a202c 100%);
+  animation: darkPulse 6s ease-in-out infinite alternate;
+}
+
+/* Mood animations for app */
+@keyframes happyGlow {
+  0% { filter: brightness(1) saturate(1); }
+  100% { filter: brightness(1.1) saturate(1.2); }
+}
+
+@keyframes sadFlow {
+  0% { filter: brightness(0.8) saturate(0.7); }
+  100% { filter: brightness(0.9) saturate(0.9); }
+}
+
+@keyframes energeticPulse {
+  0% { filter: brightness(1) saturate(1.2) hue-rotate(0deg); }
+  100% { filter: brightness(1.2) saturate(1.4) hue-rotate(10deg); }
+}
+
+@keyframes calmWave {
+  0% { filter: brightness(0.9) saturate(0.8); }
+  100% { filter: brightness(1) saturate(1); }
+}
+
+@keyframes romanticGlow {
+  0% { filter: brightness(1) saturate(1.1); }
+  100% { filter: brightness(1.1) saturate(1.3); }
+}
+
+@keyframes nostalgicFade {
+  0% { filter: brightness(0.9) saturate(0.9) sepia(0.1); }
+  100% { filter: brightness(1) saturate(1) sepia(0.2); }
+}
+
+@keyframes darkPulse {
+  0% { filter: brightness(0.7) saturate(0.8); }
+  100% { filter: brightness(0.8) saturate(1); }
 }
 
 .header-wrapper {
-  margin-bottom: clamp(1.5rem, 4vw, 3rem);
   position: relative;
   z-index: 10;
-  transition: all 0.3s ease;
+  transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .main-content {
-  margin: 0;
+  margin-top: 3.5rem;
   padding: 0;
   display: flex;
   flex-direction: column;
@@ -36,14 +141,14 @@
   justify-content: flex-start;
   flex: 1;
   position: relative;
-  transition: all 0.3s ease;
+  transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .footer-wrapper {
   margin-top: auto;
   position: relative;
   z-index: 10;
-  transition: all 0.3s ease;
+  transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* Responsive Design for App */
@@ -52,20 +157,12 @@
     overflow-x: hidden;
   }
 
-  .header-wrapper {
-    margin-bottom: clamp(1rem, 3vw, 2rem);
-  }
-
   .main-content {
     padding: 0;
   }
 }
 
 @media (max-width: 480px) {
-  .header-wrapper {
-    margin-bottom: 1rem;
-  }
-
   .app {
     overflow: hidden;
   }

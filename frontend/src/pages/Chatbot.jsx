@@ -81,7 +81,22 @@ const Chatbot = () => {
 
   // Removed automatic scroll - users can scroll manually for better control
 
+  // Cleanup mood classes on unmount
+  useEffect(() => {
+    return () => {
+      const appElement = document.querySelector('.app');
+      if (appElement) {
+        appElement.className = appElement.className.replace(/mood-\w+/g, '');
+      }
+    };
+  }, []);
 
+  // Debug playlist changes
+  useEffect(() => {
+    console.log('🔄 Playlist state changed:', currentPlaylist);
+    console.log('📊 New playlist length:', currentPlaylist.length);
+    console.log('🎵 Songs in playlist:', currentPlaylist.map(song => `${song.title} - ${song.artist}`));
+  }, [currentPlaylist]);
 
   const appendMessage = (text, sender = 'bot') => {
     console.log('Adding message:', { text, sender });
@@ -128,6 +143,17 @@ const Chatbot = () => {
       setCurrentMoodTheme(detectedMood);
       console.log('Mood detected and updated:', detectedMood);
 
+      // Apply mood class to the app container for global theming
+      const appElement = document.querySelector('.app');
+      if (appElement) {
+        // Remove existing mood classes
+        appElement.className = appElement.className.replace(/mood-\w+/g, '');
+        // Add new mood class
+        if (detectedMood) {
+          appElement.classList.add(`mood-${detectedMood}`);
+        }
+      }
+
       // Add a subtle notification about mood change
       setTimeout(() => {
         appendMessage(
@@ -143,27 +169,42 @@ const Chatbot = () => {
             🎨 Theme updated to match your {detectedMood} mood
           </div>
         );
-      }, 1000);
+      }, 1200);
     }
   };
 
   // Playlist Management Functions
   const addSongToPlaylist = (song) => {
-    console.log('Adding song to playlist:', song);
-    console.log('Current playlist before adding:', currentPlaylist);
+    console.log('🎵 ADDING SONG:', song.title, 'by', song.artist);
 
-    const newPlaylist = [...currentPlaylist, song];
-    setCurrentPlaylist(newPlaylist);
+    // Use functional state update to ensure we get the latest state
+    setCurrentPlaylist(prevPlaylist => {
+      console.log('📋 PREVIOUS PLAYLIST:', prevPlaylist.length, 'songs');
+
+      // Check for duplicates
+      const isDuplicate = prevPlaylist.some(existingSong =>
+        existingSong.title === song.title && existingSong.artist === song.artist
+      );
+
+      if (isDuplicate) {
+        console.log('⚠️ DUPLICATE FOUND, NOT ADDING');
+        appendMessage(`⚠️ "${song.title}" by ${song.artist} is already in your playlist!`);
+        return prevPlaylist;
+      }
+
+      const newPlaylist = [...prevPlaylist, song];
+      console.log('✅ NEW PLAYLIST:', newPlaylist.length, 'songs');
+      console.log('🎵 SONGS:', newPlaylist.map(s => `${s.title} - ${s.artist}`));
+
+      return newPlaylist;
+    });
+
     setLastRecommendedSong(song);
+    setIsPlaylistMode(true);
 
-    console.log('New playlist after adding:', newPlaylist);
-
-    // Set playlist mood based on first song if not set
-    if (currentPlaylist.length === 0 && !playlistMood) {
-      setPlaylistMood('mixed'); // Default mood
-    }
-
-    return newPlaylist;
+    // Return the expected new playlist for immediate use
+    const expectedPlaylist = [...currentPlaylist, song];
+    return expectedPlaylist;
   };
 
   const removeSongFromPlaylist = (index) => {
@@ -184,10 +225,13 @@ const Chatbot = () => {
 
   // Show current playlist and management actions
   const showCurrentPlaylistAndActions = (playlistToShow = null) => {
-    // Use provided playlist or current state
+    // Always use the provided playlist if available, otherwise current state
     const playlist = playlistToShow || currentPlaylist;
 
-    // First show the current playlist
+    console.log('🎵 Showing playlist - provided:', playlistToShow?.length || 0, 'current:', currentPlaylist.length);
+    console.log('📊 Final playlist to display:', playlist.length, 'songs');
+
+    // Always show the playlist, even if empty
     if (playlist.length > 0) {
       const playlistDisplay = (
         <div className="playlist-display">
@@ -226,6 +270,54 @@ const Chatbot = () => {
             onClick={() => showRemoveSongOptions()}
           >
             ❌ Remove Songs
+          </button>
+          <button
+            className="follow-up-button"
+            onClick={() => {
+              console.log('🐛 DEBUG - Current playlist state:', currentPlaylist);
+              console.log('🐛 DEBUG - Playlist length:', currentPlaylist.length);
+              appendMessage(`🐛 DEBUG: Playlist has ${currentPlaylist.length} songs: ${currentPlaylist.map(song => `${song.title} - ${song.artist}`).join(', ') || 'None'}`);
+            }}
+          >
+            🐛 Debug Playlist
+          </button>
+          <button
+            className="follow-up-button"
+            onClick={() => {
+              // Direct state manipulation test
+              const testSong = { title: `Test Song ${Date.now()}`, artist: 'Test Artist', spotify: {}, geniusUrl: '' };
+              console.log('🧪 DIRECT TEST - Adding:', testSong.title);
+
+              setCurrentPlaylist(prev => {
+                const newList = [...prev, testSong];
+                console.log('🧪 DIRECT TEST - New playlist:', newList.length, 'songs');
+
+                // Show playlist immediately
+                setTimeout(() => {
+                  appendMessage(`🧪 DIRECT TEST: Playlist now has ${newList.length} songs`);
+                  if (newList.length > 0) {
+                    const playlistDisplay = (
+                      <div className="playlist-display">
+                        <h3>🧪 TEST PLAYLIST ({newList.length} songs):</h3>
+                        {newList.map((song, index) => (
+                          <div key={index} className="playlist-item">
+                            <span className="track-number">{index + 1}.</span>
+                            <div className="track-info">
+                              <p><strong>{song.title}</strong> by <em>{song.artist}</em></p>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    );
+                    appendMessage(playlistDisplay);
+                  }
+                }, 100);
+
+                return newList;
+              });
+            }}
+          >
+            🧪 Direct Test
           </button>
           {playlist.length >= 3 ? (
             <button
@@ -428,35 +520,45 @@ const Chatbot = () => {
     try {
       switch (action) {
         case 'start_playlist_with_song':
-          console.log('Starting playlist with song data:', data);
+          console.log('🎵 Starting playlist with song data:', data);
 
           const songToAdd = data || lastRecommendedSong;
           if (songToAdd) {
+            // Clear any existing playlist first
+            setCurrentPlaylist([]);
             setIsPlaylistMode(true);
-            const newPlaylist = addSongToPlaylist(songToAdd);
+
+            // Add the song to the now-empty playlist
+            const newPlaylist = [songToAdd];
+            setCurrentPlaylist(newPlaylist);
+            setLastRecommendedSong(songToAdd);
+
             appendMessage(`🎵 Started a new playlist! Added "${songToAdd.title}" by ${songToAdd.artist} as your first song.`);
 
-            // Show the playlist immediately with the updated playlist
+            // Show the playlist immediately
             setTimeout(() => {
               showCurrentPlaylistAndActions(newPlaylist);
-            }, 500);
+            }, 300);
           } else {
-            console.log('No song data available - data:', data, 'lastRecommendedSong:', lastRecommendedSong);
+            console.log('❌ No song data available');
             appendMessage('❌ No song to start playlist with. Please get a song recommendation first!');
           }
           break;
 
         case 'add_current':
+          console.log('🎯 Manual add triggered - data:', data, 'lastRecommendedSong:', lastRecommendedSong);
           const songToAddCurrent = data || lastRecommendedSong;
           if (songToAddCurrent) {
+            console.log('✅ Adding song manually:', songToAddCurrent);
             const updatedPlaylist = addSongToPlaylist(songToAddCurrent);
             appendMessage(`✅ Added "${songToAddCurrent.title}" by ${songToAddCurrent.artist} to your playlist!`);
 
-            // Show updated playlist with the new playlist data
+            // Show updated playlist immediately
             setTimeout(() => {
               showCurrentPlaylistAndActions(updatedPlaylist);
-            }, 500);
+            }, 300);
           } else {
+            console.log('❌ No song available to add');
             appendMessage('❌ No song to add. Please get a song recommendation first!');
           }
           break;
@@ -656,22 +758,21 @@ const Chatbot = () => {
             className="spotify-embed"
           />
         )}
-        <p className="lyrics-full">
-          <a href={geniusUrl} target="_blank" rel="noopener noreferrer">
-            View full lyrics on Genius →
-          </a>
-        </p>
       </div>
     );
 
     // Show appropriate actions based on playlist state
     setTimeout(() => {
+      console.log('🎵 Checking playlist mode - isPlaylistMode:', isPlaylistMode);
+      console.log('📋 Current playlist length:', currentPlaylist.length);
+
       if (isPlaylistMode || currentPlaylist.length > 0) {
         // User is building a playlist - automatically add the song and show updated playlist
+        console.log('✅ Auto-adding song to playlist');
         const updatedPlaylist = addSongToPlaylist(currentSong);
         appendMessage(`✅ Added "${currentSong.title}" by ${currentSong.artist} to your playlist!`);
 
-        // Show updated playlist after a short delay with the new playlist data
+        // Show updated playlist immediately using the returned playlist
         setTimeout(() => {
           showCurrentPlaylistAndActions(updatedPlaylist);
         }, 500);
@@ -680,12 +781,21 @@ const Chatbot = () => {
         const regularActions = (
           <div className="follow-ups">
             <p className="follow-up-intro">🎵 Love this song? What's next?</p>
-            <button className="follow-up-button" onClick={() => {
-              console.log('Button clicked, currentSong:', currentSong);
-              handleFollowUpAction('start_playlist_with_song', currentSong);
-            }}>
-              ➕ Start Playlist with This Song
-            </button>
+            {currentPlaylist.length > 0 ? (
+              <button className="follow-up-button" onClick={() => {
+                console.log('Adding to existing playlist, currentSong:', currentSong);
+                handleFollowUpAction('add_current', currentSong);
+              }}>
+                ➕ Add to My Playlist ({currentPlaylist.length} songs)
+              </button>
+            ) : (
+              <button className="follow-up-button" onClick={() => {
+                console.log('Button clicked, currentSong:', currentSong);
+                handleFollowUpAction('start_playlist_with_song', currentSong);
+              }}>
+                ➕ Start Playlist with This Song
+              </button>
+            )}
             <button className="follow-up-button" onClick={() => handleFollowUpAction('similar_song', currentSong)}>
               🔄 More Like This
             </button>

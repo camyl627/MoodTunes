@@ -4,8 +4,6 @@
 .footer {
   position: static;
   width: 100%;
-  padding: 2rem;
-  margin-top: 2rem;
   background-color: #f1f1f1;
 }
 
@@ -66,8 +64,9 @@
 .credits-text {
   font-family: var(--font-secondary);
   font-size: 0.9rem;
-  color: var(--primary-color);
+  color: var(--footer-credits-color, var(--primary-color));
   font-weight: 500;
+  transition: color 0.8s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .credits-icons {
@@ -78,14 +77,20 @@
 
 .credit-icon {
   font-size: 1.35rem;
-  transition: transform 0.2s ease;
+  transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
   display: flex;
   align-items: center;
   justify-content: center;
+  color: var(--footer-icon-color, var(--primary-color));
+  padding: 4px;
+  border-radius: 6px;
+  background: var(--footer-icon-bg, transparent);
 }
 
 .credit-icon:hover {
-  transform: scale(1.15);
+  transform: scale(1.15) translateY(-1px);
+  color: var(--footer-icon-hover-color, var(--accent-color, #38b2ac));
+  background: var(--footer-icon-hover-bg, rgba(56, 178, 172, 0.1));
 }
 
 /* Responsive design */
