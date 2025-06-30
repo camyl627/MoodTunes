@@ -470,7 +470,51 @@ const Chatbot = () => {
 
         case 'add_more_songs':
           appendMessage('🎵 Let\'s add more songs to your playlist! What mood or style would you like to add?');
-          appendMessage('💡 Try: "Add some upbeat songs", "Add a slow song", "Add something from the 80s", etc.');
+
+          setTimeout(() => {
+            const addSongsOptions = (
+              <div className="follow-ups">
+                <p className="follow-up-intro">🎵 Quick options to add songs:</p>
+                <button
+                  className="follow-up-button"
+                  onClick={() => {
+                    appendMessage('Same mood', 'user');
+                    sendMessage('Add another song with the same mood and energy as my current playlist', true);
+                  }}
+                >
+                  🔄 Same Mood/Energy
+                </button>
+                <button
+                  className="follow-up-button"
+                  onClick={() => {
+                    appendMessage('Add upbeat songs', 'user');
+                    sendMessage('Add some upbeat energetic songs to my playlist', true);
+                  }}
+                >
+                  ⚡ Add Upbeat Songs
+                </button>
+                <button
+                  className="follow-up-button"
+                  onClick={() => {
+                    appendMessage('Add chill songs', 'user');
+                    sendMessage('Add some chill relaxing songs to my playlist', true);
+                  }}
+                >
+                  😌 Add Chill Songs
+                </button>
+                <button
+                  className="follow-up-button"
+                  onClick={() => {
+                    appendMessage('Add classic hits', 'user');
+                    sendMessage('Add some classic hit songs to my playlist', true);
+                  }}
+                >
+                  🎶 Add Classic Hits
+                </button>
+              </div>
+            );
+            appendMessage(addSongsOptions);
+          }, 500);
           break;
 
         case 'different_mood':
@@ -523,6 +567,90 @@ const Chatbot = () => {
     }
   };
 
+  // Handle song recommendation response
+  const handleSongRecommendationResponse = (output, conversationHistory) => {
+    const { lyricsSnippet, songTitle, artist, spotify, geniusUrl } = output;
+    const currentSong = {
+      title: songTitle,
+      artist,
+      spotify: {
+        track_id: spotify?.track_id,
+        embed_url: spotify?.embed_url,
+        external_url: spotify?.external_url
+      },
+      geniusUrl
+    };
+
+    // Store the recommended song
+    setLastRecommendedSong(currentSong);
+    console.log('Stored recommended song:', currentSong);
+
+    // Update conversation history
+    const aiResponseContent = output.conversationMessage || output.message || 'Response received';
+    const aiResponse = { role: 'assistant', content: aiResponseContent };
+    const newConversationHistory = [...conversationHistory, aiResponse];
+    setConversationHistory(newConversationHistory);
+
+    appendMessage(
+      <div>
+        <p className="lyrics">"{lyricsSnippet}"</p>
+        <p className="song-info">
+          🎵 <strong>{songTitle}</strong> by <em>{artist}</em>
+        </p>
+        {spotify?.embed_url && (
+          <iframe
+            title="Spotify Preview"
+            src={spotify.embed_url}
+            width="100%"
+            height="80"
+            style={{ border: 'none' }}
+            allow="encrypted-media"
+            className="spotify-embed"
+          />
+        )}
+        <p className="lyrics-full">
+          <a href={geniusUrl} target="_blank" rel="noopener noreferrer">
+            View full lyrics on Genius →
+          </a>
+        </p>
+      </div>
+    );
+
+    // Show appropriate actions based on playlist state
+    setTimeout(() => {
+      if (isPlaylistMode || currentPlaylist.length > 0) {
+        // User is building a playlist - automatically add the song and show updated playlist
+        const updatedPlaylist = addSongToPlaylist(currentSong);
+        appendMessage(`✅ Added "${currentSong.title}" by ${currentSong.artist} to your playlist!`);
+
+        // Show updated playlist after a short delay with the new playlist data
+        setTimeout(() => {
+          showCurrentPlaylistAndActions(updatedPlaylist);
+        }, 500);
+      } else {
+        // Regular song discovery mode
+        const regularActions = (
+          <div className="follow-ups">
+            <p className="follow-up-intro">🎵 Love this song? What's next?</p>
+            <button className="follow-up-button" onClick={() => {
+              console.log('Button clicked, currentSong:', currentSong);
+              handleFollowUpAction('start_playlist_with_song', currentSong);
+            }}>
+              ➕ Start Playlist with This Song
+            </button>
+            <button className="follow-up-button" onClick={() => handleFollowUpAction('similar_song', currentSong)}>
+              🔄 More Like This
+            </button>
+            <button className="follow-up-button" onClick={() => handleFollowUpAction('different_mood')}>
+              🎭 Different Vibe
+            </button>
+          </div>
+        );
+        appendMessage(regularActions);
+      }
+    }, 500);
+  };
+
   // Main sendMessage function
   const sendMessage = async (messageText = null, skipUserMessage = false) => {
     const messageToSend = messageText || input.trim();
@@ -540,6 +668,49 @@ const Chatbot = () => {
       setInput('');
       setIsSending(false);
       return;
+    }
+
+    // Smart detection for playlist building shortcuts
+    if ((isPlaylistMode || currentPlaylist.length > 0) && !skipUserMessage) {
+      const lowerMessage = messageToSend.toLowerCase();
+      if (lowerMessage.includes('same mood') || lowerMessage === 'same' || lowerMessage.includes('similar')) {
+        // Convert to a more specific request
+        const enhancedMessage = `Add another song with the same mood and energy as my current playlist`;
+        console.log('Enhanced playlist request:', enhancedMessage);
+        // Replace the user message with the enhanced version
+        appendMessage(messageToSend, 'user');
+        setInput('');
+        setIsSending(true);
+
+        // Use the enhanced message for the API call
+        const newUserMessage = { role: 'user', content: enhancedMessage };
+        const updatedHistory = [...conversationHistory, newUserMessage];
+
+        // Continue with API call using enhanced message
+        try {
+          const response = await fetch('/api/moodtunes-chat', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ chats: updatedHistory }),
+          });
+
+          const data = await response.json();
+          const { output } = data;
+
+          if (output && output.type === 'song_recommendation') {
+            // Handle the song recommendation as usual
+            handleSongRecommendationResponse(output, updatedHistory);
+          } else {
+            appendMessage(output?.message || 'Sorry, something went wrong.');
+          }
+        } catch (err) {
+          console.error('Chat error:', err);
+          appendMessage('Failed to get song recommendation.');
+        } finally {
+          setIsSending(false);
+        }
+        return;
+      }
     }
 
     // Add user message unless we're skipping it
@@ -592,112 +763,68 @@ const Chatbot = () => {
 
       // Handle song recommendation response
       if (output.type === 'song_recommendation') {
-        console.log('Raw API output:', output);
-        const { lyricsSnippet, songTitle, artist, spotify, geniusUrl } = output;
-
-        // Create song object
-        const currentSong = {
-          title: songTitle,
-          artist,
-          spotify: {
-            track_id: spotify?.track_id,
-            embed_url: spotify?.embed_url,
-            external_url: spotify?.external_url
-          },
-          geniusUrl
-        };
-
-        console.log('Created song object:', currentSong);
-        console.log('Setting lastRecommendedSong...');
-
-        // Store the recommended song
-        setLastRecommendedSong(currentSong);
-
-        // Verify it was set (this will show the previous value due to React's async nature)
-        console.log('Current lastRecommendedSong state:', lastRecommendedSong);
-
-        appendMessage(
-          <div>
-            <p className="lyrics">"{lyricsSnippet}"</p>
-            <p className="song-info">
-              🎵 <strong>{songTitle}</strong> by <em>{artist}</em>
-            </p>
-            {spotify?.embed_url && (
-              <iframe
-                title="Spotify Preview"
-                src={spotify.embed_url}
-                width="100%"
-                height="80"
-                style={{ border: 'none' }}
-                allow="encrypted-media"
-                className="spotify-embed"
-              />
-            )}
-            <p className="lyrics-full">
-              <a href={geniusUrl} target="_blank" rel="noopener noreferrer">
-                View full lyrics on Genius →
-              </a>
-            </p>
-          </div>
-        );
-
-        // Show appropriate actions based on playlist state
-        setTimeout(() => {
-          if (isPlaylistMode || currentPlaylist.length > 0) {
-            // User is building a playlist - automatically add the song and show updated playlist
-            const updatedPlaylist = addSongToPlaylist(currentSong);
-            appendMessage(`✅ Added "${currentSong.title}" by ${currentSong.artist} to your playlist!`);
-
-            // Show updated playlist after a short delay with the new playlist data
-            setTimeout(() => {
-              showCurrentPlaylistAndActions(updatedPlaylist);
-            }, 500);
-          } else {
-            // Regular song discovery mode
-            const regularActions = (
-              <div className="follow-ups">
-                <p className="follow-up-intro">🎵 Love this song? What's next?</p>
-                <button className="follow-up-button" onClick={() => {
-                  console.log('Button clicked, currentSong:', currentSong);
-                  handleFollowUpAction('start_playlist_with_song', currentSong);
-                }}>
-                  ➕ Start Playlist with This Song
-                </button>
-                <button className="follow-up-button" onClick={() => handleFollowUpAction('similar_song', currentSong)}>
-                  🔄 More Like This
-                </button>
-                <button className="follow-up-button" onClick={() => handleFollowUpAction('different_mood')}>
-                  🎭 Different Vibe
-                </button>
-              </div>
-            );
-            appendMessage(regularActions);
-          }
-        }, 500);
+        handleSongRecommendationResponse(output, updatedHistory);
       }
 
       // Handle conversational response
       if (output.type === 'conversation') {
         appendMessage(output.message);
 
-        // Show generic follow-up prompts for conversational responses
-        if (output.followUps && output.followUps.length > 0) {
-          const followUpButtons = (
-            <div className="follow-ups">
-              <p className="follow-up-intro">💭 Continue the conversation:</p>
-              {output.followUps.map((prompt, index) => (
+        // Show context-appropriate follow-up prompts
+        if (isPlaylistMode || currentPlaylist.length > 0) {
+          // User is building a playlist - show playlist-relevant options
+          setTimeout(() => {
+            const playlistFollowUps = (
+              <div className="follow-ups">
+                <p className="follow-up-intro">🎵 Continue building your playlist:</p>
                 <button
-                  key={index}
                   className="follow-up-button"
-                  disabled={isSending}
-                  onClick={() => handleFollowUpAction(prompt)}
+                  onClick={() => {
+                    appendMessage('Get me a song recommendation', 'user');
+                    sendMessage('Give me a song recommendation for my playlist', true);
+                  }}
                 >
-                  {isSending ? '...' : prompt}
+                  🎵 Get Song Recommendation
                 </button>
-              ))}
-            </div>
-          );
-          appendMessage(followUpButtons);
+                <button
+                  className="follow-up-button"
+                  onClick={() => handleFollowUpAction('add_more_songs')}
+                >
+                  ➕ Add Different Style
+                </button>
+                <button
+                  className="follow-up-button"
+                  onClick={() => {
+                    const updatedPlaylist = currentPlaylist; // Use current state
+                    showCurrentPlaylistAndActions(updatedPlaylist);
+                  }}
+                >
+                  👀 View My Playlist ({currentPlaylist.length} songs)
+                </button>
+              </div>
+            );
+            appendMessage(playlistFollowUps);
+          }, 500);
+        } else {
+          // Regular conversation mode - show generic follow-ups
+          if (output.followUps && output.followUps.length > 0) {
+            const followUpButtons = (
+              <div className="follow-ups">
+                <p className="follow-up-intro">💭 Continue the conversation:</p>
+                {output.followUps.map((prompt, index) => (
+                  <button
+                    key={index}
+                    className="follow-up-button"
+                    disabled={isSending}
+                    onClick={() => handleFollowUpAction(prompt)}
+                  >
+                    {isSending ? '...' : prompt}
+                  </button>
+                ))}
+              </div>
+            );
+            appendMessage(followUpButtons);
+          }
         }
       }
 

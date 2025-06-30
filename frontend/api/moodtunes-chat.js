@@ -86,6 +86,17 @@ export default async function handler(req, res) {
   }
 
   try {
+    // Check if user is in playlist building mode based on recent messages
+    const recentMessages = chats.slice(-3).map(msg => msg.content.toLowerCase());
+    const isPlaylistMode = recentMessages.some(msg =>
+      msg.includes('playlist') ||
+      msg.includes('add more songs') ||
+      msg.includes('same mood') ||
+      msg.includes('add another song') ||
+      msg.includes('add some') ||
+      msg.includes('building')
+    );
+
     // 1. Generate response from OpenAI with comprehensive system prompt
     const completion = await openai.chat.completions.create({
       model: "gpt-3.5-turbo",
@@ -93,6 +104,15 @@ export default async function handler(req, res) {
         {
           role: "system",
           content: `You are MoodTunes, an empathetic AI music companion and conversational chatbot that specializes in understanding human emotions and curating personalized music experiences. You have access to Spotify and Genius APIs to provide rich, interactive music recommendations and can help users create and save playlists to their Spotify accounts.
+
+${isPlaylistMode ? `
+🎵 PLAYLIST BUILDING MODE ACTIVE:
+The user is currently building a playlist. When they ask for "same mood", "similar songs", "add more songs", or any variation:
+- IMMEDIATELY provide a song recommendation in the format: "[lyric snippet]" — Song Title by Artist
+- DO NOT ask clarifying questions like "what genre" or "tell me about your mood"
+- Focus on giving them songs that match their existing playlist vibe
+- Be direct and helpful, not conversational
+` : ''}
 
 ## Your Core Identity:
 - Warm, understanding, and emotionally intelligent conversationalist
@@ -129,12 +149,19 @@ When users express interest in saving songs or creating playlists:
 "[lyric snippet]"
 — Song Title by Artist
 
-### Follow-up Prompts (For conversational responses only):
+### Follow-up Prompts:
+**For regular conversation:**
 - "Tell me more about your mood"
 - "What genre speaks to you right now?"
 - "Want to explore a different decade?"
 - "How does this song make you feel?"
 - "Ready for something completely different?"
+
+**For playlist building (when user is adding songs to a playlist):**
+- When user asks for "same mood" or "similar songs" → IMMEDIATELY provide a song recommendation, don't ask clarifying questions
+- When user asks to "add more songs" → Provide a song that fits their playlist theme
+- Focus on song recommendations rather than conversation
+- Avoid generic follow-up questions when in playlist building mode
 
 ### Playlist Suggestions:
 - "This would be perfect for a [mood/activity] playlist!"
