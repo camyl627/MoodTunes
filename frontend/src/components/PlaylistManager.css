@@ -1,0 +1,91 @@
+/* PlaylistManager.css */
+
+.playlist-display {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  padding: 1.5rem;
+  margin: 1rem 0;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.playlist-display h3 {
+  color: var(--text-primary, #ffffff);
+  margin-bottom: 1rem;
+  font-size: 1.2rem;
+  text-align: center;
+}
+
+.playlist-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.playlist-item:last-child {
+  border-bottom: none;
+}
+
+.track-number {
+  color: var(--accent-color, #38b2ac);
+  font-weight: bold;
+  min-width: 24px;
+  font-size: 0.9rem;
+}
+
+.track-info {
+  flex: 1;
+}
+
+.track-info p {
+  margin: 0;
+  color: var(--text-primary, #ffffff);
+  font-size: 0.95rem;
+  line-height: 1.4;
+}
+
+.track-info strong {
+  color: var(--text-primary, #ffffff);
+}
+
+.track-info em {
+  color: var(--text-secondary, rgba(255, 255, 255, 0.8));
+}
+
+.spotify-link {
+  color: var(--accent-color, #38b2ac);
+  text-decoration: none;
+  font-size: 0.85rem;
+  margin-top: 4px;
+  display: inline-block;
+  transition: color 0.3s ease;
+}
+
+.spotify-link:hover {
+  color: var(--secondary-color, #4299e1);
+}
+
+.playlist-actions {
+  margin-top: 1rem;
+  text-align: center;
+}
+
+.playlist-summary {
+  color: var(--text-secondary, rgba(255, 255, 255, 0.8));
+  font-size: 0.9rem;
+  margin: 0;
+  font-style: italic;
+}
+
+.playlist-manager-debug {
+  background: rgba(255, 255, 0, 0.1);
+  border: 1px solid rgba(255, 255, 0, 0.3);
+  border-radius: 8px;
+  padding: 1rem;
+  margin: 1rem 0;
+  font-family: monospace;
+  font-size: 0.8rem;
+  color: var(--text-primary, #ffffff);
+}
