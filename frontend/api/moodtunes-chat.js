@@ -129,12 +129,12 @@ When users express interest in saving songs or creating playlists:
 "[lyric snippet]"
 — Song Title by Artist
 
-### Follow-up Prompts (Include 2-3 options):
-- "Want another track with the same energy?"
-- "Ready to explore a different mood?"
-- "Should we add this to a playlist?"
-- "Tell me what you think of this one!"
-- "Want to hear something from a different decade?"
+### Follow-up Prompts (For conversational responses only):
+- "Tell me more about your mood"
+- "What genre speaks to you right now?"
+- "Want to explore a different decade?"
+- "How does this song make you feel?"
+- "Ready for something completely different?"
 
 ### Playlist Suggestions:
 - "This would be perfect for a [mood/activity] playlist!"

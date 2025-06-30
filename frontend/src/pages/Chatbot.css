@@ -244,6 +244,158 @@
   margin-bottom: 0;
 }
 
+.playlist-display {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  padding: 1rem;
+  margin: 0.5rem 0;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.playlist-display h3 {
+  color: var(--tertiary-color);
+  margin-bottom: 0.75rem;
+  font-size: 1.1rem;
+}
+
+.playlist-item {
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 8px;
+  padding: 0.5rem 0.75rem;
+  margin-bottom: 0.5rem;
+  border-left: 3px solid var(--accent-color);
+}
+
+.playlist-item:last-child {
+  margin-bottom: 0;
+}
+
+.playlist-item p {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--tertiary-color);
+}
+
+.follow-up-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.follow-up-button:disabled:hover {
+  background: rgba(255, 255, 255, 0.1);
+  transform: none;
+}
+
+.follow-up-button.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background: rgba(255, 255, 255, 0.05) !important;
+  border-color: rgba(255, 255, 255, 0.2) !important;
+  color: rgba(255, 255, 255, 0.6) !important;
+}
+
+.follow-up-button.disabled:hover {
+  background: rgba(255, 255, 255, 0.05) !important;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+.playlist-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+}
+
+.track-number {
+  color: var(--accent-color);
+  font-weight: bold;
+  min-width: 1.5rem;
+}
+
+.track-info {
+  flex: 1;
+}
+
+.spotify-link {
+  color: var(--accent-color);
+  text-decoration: none;
+  font-size: 0.8rem;
+  opacity: 0.8;
+  transition: opacity 0.2s ease;
+}
+
+.spotify-link:hover {
+  opacity: 1;
+  text-decoration: underline;
+}
+
+.playlist-actions {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.playlist-summary {
+  font-style: italic;
+  color: var(--tertiary-color);
+  opacity: 0.8;
+  margin: 0;
+}
+
+.playlist-export, .playlist-share {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  padding: 1rem;
+  margin: 0.5rem 0;
+}
+
+.playlist-text, .share-text {
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 8px;
+  padding: 1rem;
+  color: var(--tertiary-color);
+  font-family: 'Courier New', monospace;
+  font-size: 0.9rem;
+  line-height: 1.4;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  margin: 0.5rem 0;
+}
+
+.export-tip {
+  color: var(--accent-color);
+  font-size: 0.9rem;
+  margin: 0.5rem 0 0 0;
+  opacity: 0.8;
+}
+
+.remove-song-btn {
+  background: rgba(255, 100, 100, 0.1) !important;
+  border-color: rgba(255, 100, 100, 0.3) !important;
+}
+
+.remove-song-btn:hover {
+  background: rgba(255, 100, 100, 0.2) !important;
+  border-color: rgba(255, 100, 100, 0.5) !important;
+}
+
+.follow-up-button:has-text("Create Playlist on Spotify"),
+.follow-up-button:has-text("Connect & Create Playlist"),
+.follow-up-button:has-text("Go to Spotify Now") {
+  background: linear-gradient(135deg, #1db954, #1ed760) !important;
+  border-color: #1db954 !important;
+  color: white !important;
+  font-weight: bold;
+}
+
+.follow-up-button:has-text("Create Playlist on Spotify"):hover,
+.follow-up-button:has-text("Connect & Create Playlist"):hover,
+.follow-up-button:has-text("Go to Spotify Now"):hover {
+  background: linear-gradient(135deg, #1ed760, #1db954) !important;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(29, 185, 84, 0.3);
+}
+
 .spotify-embed {
   margin-top: 0.5rem;
   border: none;
